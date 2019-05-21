@@ -27,7 +27,7 @@ local unicorndecode = {
 local luaver = tonumber(_VERSION:sub(5))
 
 -- load up the unicode magic python/perl tables!
-local unicodeMagics = require('unidecode_data')
+local unicodeMagics = require('unidecode_data') or include('includes/modules/unidecode_data.lua')
 
 -- create a fallback mechanism... (just returns '[?]')
 local backupTable = setmetatable({}, {__index = function() return '[?]' end})
@@ -37,7 +37,7 @@ setmetatable(unicodeMagics, {__index = function() return backupTable end})
 -- for lua 5.1, luabitop would need to be installed
 local bor, blshift, brshift
 if luaver == 5.1 then
-    bit = require("bit")
+    bit = require("bit") or bit
     bor, blshift, brshift = bit.bor, bit.lshift, bit.rshift
 elseif luaver == 5.2 then
     bor, blshift, brshift = bit32.bor, bit32.lshift, bit32.rshift    
@@ -46,7 +46,7 @@ end
 -- load up utf8.codes. In lua 5.3+ this is baked in, otherwise the lua function provides
 -- similar functionality
 local utf8codes
-if luaver > 5.2 then
+if utf8 and utf8.codes then
     utf8codes = utf8.codes
 else
     -- declare the function!
@@ -141,4 +141,5 @@ function unicorndecode.decode(inputString)
     return trim(final), inputLength ~= (count) -- this is more of a byte count than anything
 end
 
+_G.unicorndecode=unicorndecode
 return unicorndecode
